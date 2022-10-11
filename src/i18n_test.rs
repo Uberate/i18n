@@ -1,4 +1,4 @@
-use crate::i18n::{I18n, message_objects_to_strings, MessageObject};
+use crate::i18n::{I18n, MessageObject};
 
 #[test]
 fn test_i18n() {
@@ -40,7 +40,7 @@ fn test_message_objects_to_strings() {
 
     let res = MessageObject::from_strings(&message_strings);
 
-    let res = message_objects_to_strings(res);
+    let res = MessageObject::message_objects_to_strings(res);
     message_strings.remove(3);
 
     assert_eq!(res, message_strings);
