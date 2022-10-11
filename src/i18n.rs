@@ -1,3 +1,5 @@
+//! The mod i18n is core logic for I18n tools.
+
 use std::collections::HashMap;
 use std::sync::RwLock;
 
@@ -27,19 +29,20 @@ pub struct I18n {
 impl I18n {
     /// The function message will return the message by specify namespace, code and languages.
     ///
-    /// If specify message not found, the [message] will return [None], else return [Some<String>].
+    /// If specify message not found, the [I18n.message] will return [None], else return [Some<String>].
     /// And if specify message not found in specify language, will try to search message in
     /// default_language(if default_language not empty).
     ///
     /// ## Example
     /// ```rust
-    /// let mut i = I18n::new("en".to_string(), true);
+    /// use i18n::i18n::I18n;
+    /// let mut i = I18n::new("en".to_string(), true, 2);
     /// i.register_message(&"test".to_string(),
     ///                    &"test".to_string(),
     ///                    &"test".to_string(),
     ///                    &"test".to_string());
     /// match i.message(&"test".to_string(), &"test".to_string(), &"test".to_string()) {
-    ///      Some(t) => { assert_eq!(t, "test".to_string()); }
+    ///      Some(t) => { assert_eq!(t, &"test".to_string()); }
     ///      _ => { assert_eq!(1, 2); }
     /// }
     /// ```
@@ -60,7 +63,7 @@ impl I18n {
         None
     }
 
-    /// The function register_message_object like [register_message], is used to register a message
+    /// The function register_message_object like [I18n.register_message], is used to register a message
     /// info to [I18n].
     pub fn register_message_object(&mut self, object: MessageObject) {
         for x in object.message {
@@ -81,19 +84,21 @@ impl I18n {
     ///
     /// If the [I18n] is not enable change, the register will do nothing.
     /// ## Example
-    /// ```
-    /// let mut i = I18n::new("en".to_string(), true);
+    /// ```rust
+    /// use i18n::i18n::I18n;
+    /// let mut i = I18n::new("en".to_string(), true, 2);
     /// i.register_message(&"test".to_string(),
     ///                    &"test".to_string(),
     ///                    &"test".to_string(),
     ///                    &"test".to_string());
     /// match i.message(&"test".to_string(), &"test".to_string(), &"test".to_string()) {
-    ///      Some(t) => { assert_eq!(t, "test".to_string()); }
+    ///      Some(t) => { assert_eq!(t, &"test".to_string()); }
     ///      _ => { assert_eq!(1, 2); }
     /// }
     /// ```
     ///
-    /// You can use [MessageObject] directly to register. See function [register_message_object].
+    /// You can use [MessageObject] directly to register. See function
+    /// [I18n.register_message_object].
     pub fn register_message(&mut self,
                             namespace: &String, code: &String, language: &String, message: &String) {
         if !self.enable_change {
@@ -132,10 +137,16 @@ impl I18n {
         }
     }
 
-    /// The disable_change is non reversible function, that means you can't change the changeable
-    /// when [I18n] is disable changed.
+    /// Disable [I18n] change, in feature, it cloud provide a high-performance apis when disable
+    /// changed.
     pub fn disable_change(&mut self) {
         self.enable_change = false
+    }
+
+    /// Enable [I18n] change, in feature, it cloud provide a lower-performance apis when enable
+    /// changed.
+    pub fn enable_change(&mut self) {
+        self.enable_change = true
     }
 
     pub fn is_enable_change(&self) -> bool {
@@ -149,7 +160,7 @@ impl I18n {
     pub fn new(default_language: String, enable_change: bool, mut read_thread_count: i8) -> Self {
         // if read_thread_count <= 0, reset to default '10'
         if read_thread_count <= 0 {
-            read_thread_count = 10
+            read_thread_count = 5
         }
         I18n {
             messages: HashMap::new(),
@@ -172,7 +183,7 @@ impl MessageObject {
     /// a header at first line. The first line always define the language info.
     ///
     /// ## Like this:
-    /// ```
+    /// ```bash
     /// ------------------------------------
     /// | namespace |  code  |  en  |  zh  |  <- Header at first line.
     /// ------------------------------------
