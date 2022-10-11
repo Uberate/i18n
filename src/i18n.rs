@@ -262,59 +262,61 @@ impl MessageObject {
 
         res
     }
-}
 
-pub fn message_objects_to_strings(message_objects: Vec<MessageObject>) -> Vec<Vec<String>> {
-    let mut res = Vec::new();
 
-    // To cache the header index.
-    let mut header: HashMap<String, usize> = HashMap::new();
-    let mut current_header_index: usize = 0;
+    pub fn message_objects_to_strings(message_objects: Vec<MessageObject>) -> Vec<Vec<String>> {
+        let mut res = Vec::new();
 
-    // 'header_string' will insert to res[0].
-    let mut header_string: Vec<String> = Vec::from(["namespace".to_string(), "code".to_string()]);
+        // To cache the header index.
+        let mut header: HashMap<String, usize> = HashMap::new();
+        let mut current_header_index: usize = 0;
 
-    // For each all message_objects
-    for x in message_objects {
+        // 'header_string' will insert to res[0].
+        let mut header_string: Vec<String> = Vec::from(["namespace".to_string(), "code".to_string()]);
 
-        // Get namespace and code and push them to res.
-        let namespace = &x.namespace;
-        let code = &x.code;
-        let mut temp_string: Vec<String> = Vec::new();
-        temp_string.push(namespace.clone());
-        temp_string.push(code.clone());
+        // For each all message_objects
+        for x in message_objects {
 
-        // Get all language info.
-        for (language, message) in x.message {
+            // Get namespace and code and push them to res.
+            let namespace = &x.namespace;
+            let code = &x.code;
+            let mut temp_string: Vec<String> = Vec::new();
+            temp_string.push(namespace.clone());
+            temp_string.push(code.clone());
 
-            // If header not contains the language, insert it.
-            if !header.contains_key(&language) {
-                header.insert(language.clone(), current_header_index);
-                current_header_index = current_header_index + 1;
-                header_string.push(language.clone())
-            }
+            // Get all language info.
+            for (language, message) in x.message {
 
-            // Get the header index.
-            if let Some(index) = header.get(&language) {
-                while temp_string.len() <= (index.clone() + 2) {
-                    temp_string.push("".to_string())
+                // If header not contains the language, insert it.
+                if !header.contains_key(&language) {
+                    header.insert(language.clone(), current_header_index);
+                    current_header_index = current_header_index + 1;
+                    header_string.push(language.clone())
                 }
 
-                // Replace specify language value.
-                temp_string.remove(index.clone() + 2);
-                temp_string.insert(index.clone() + 2, message);
+                // Get the header index.
+                if let Some(index) = header.get(&language) {
+                    while temp_string.len() <= (index.clone() + 2) {
+                        temp_string.push("".to_string())
+                    }
+
+                    // Replace specify language value.
+                    temp_string.remove(index.clone() + 2);
+                    temp_string.insert(index.clone() + 2, message);
+                }
+            }
+            // Insert the value.
+            res.push(temp_string);
+        };
+
+        // Complete all empty language for each line of message end.
+        for x in res.iter_mut() {
+            if x.len() < header_string.len() {
+                x.push("".to_string());
             }
         }
-        // Insert the value.
-        res.push(temp_string);
-    };
-
-    // Complete all empty language for each line of message end.
-    for x in res.iter_mut() {
-        if x.len() < header_string.len() {
-            x.push("".to_string());
-        }
+        res.insert(0, header_string);
+        res
     }
-    res.insert(0, header_string);
-    res
 }
+
