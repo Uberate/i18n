@@ -12,3 +12,24 @@ Project status:
 The I18n project is for solving the problem of I18n in application or system.
 
 It provides a simple api and model to define the I18n value.
+
+## Usages
+
+### Import the project
+
+TODO
+
+## Test & Doc
+
+The rust doc: The online
+doc: [https://uberate.github.io/i18n/i18n/index.html](https://uberate.github.io/i18n/i18n/index.html)
+
+```bash
+cargo doc
+```
+
+Test code:
+
+```bash
+cargo test
+```
