@@ -14,6 +14,19 @@ use std::sync::RwLock;
 /// resource when [I18n] used in a application or system. But the [I18n] tools can ignore this rule.
 /// The tools is the application which are used to generate or manage the I18n messages.
 ///
+/// ## Example
+/// ```rust
+/// use i18n::i18n::I18n;
+/// let mut i = I18n::new("en".to_string(), true, 2);
+/// i.register_message(&"test".to_string(),
+///                    &"test".to_string(),
+///                    &"test".to_string(),
+///                    &"test".to_string());
+/// match i.message(&"test".to_string(), &"test".to_string(), &"test".to_string()) {
+///      Some(t) => { assert_eq!(t, &"test".to_string()); }
+///      _ => { assert_eq!(1, 2); }
+/// }
+/// ```
 #[derive(Debug)]
 pub struct I18n {
     // messages save the all message info. namespace-code-ln-message
