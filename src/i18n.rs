@@ -76,6 +76,23 @@ impl I18n {
         None
     }
 
+    pub fn to_message_objects(&self) -> Vec<MessageObject> {
+        let _ = self.rw_lock.read();
+        let mut res = Vec::new();
+        for (namespace, namespace_item) in &self.messages {
+            for (code, code_item) in namespace_item {
+                let message_object = MessageObject {
+                    namespace: namespace.clone(),
+                    code: code.clone(),
+                    message: code_item.clone(),
+                };
+                res.push(message_object);
+            }
+        }
+
+        res
+    }
+
     /// The function register_message_object like [I18n.register_message], is used to register a message
     /// info to [I18n].
     pub fn register_message_object(&mut self, object: MessageObject) {
@@ -341,6 +358,24 @@ impl MessageObject {
         }
         res.insert(0, header_string);
         res
+    }
+    pub fn namespace(&self) -> &str {
+        &self.namespace
+    }
+    pub fn code(&self) -> &str {
+        &self.code
+    }
+    pub fn message(&self) -> &HashMap<String, String> {
+        &self.message
+    }
+    pub fn set_namespace(&mut self, namespace: String) {
+        self.namespace = namespace;
+    }
+    pub fn set_code(&mut self, code: String) {
+        self.code = code;
+    }
+    pub fn set_message(&mut self, message: HashMap<String, String>) {
+        self.message = message;
     }
 }
 
