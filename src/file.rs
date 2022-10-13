@@ -37,6 +37,8 @@ pub fn build_from_csv_file(path: &str) -> Result<I18n, Box<dyn Error>> {
 /// The function write_to_csv_file will write all message from an [I18n] instance. And for help
 /// human read, the message will order by namespace and code.
 ///
+/// About the format, see the doc of [build_from_csv_file] function. If specify file is exists, the
+/// file value will be covered. If the dir path not found, return the err.
 pub fn write_to_csv_file(i18n: &I18n, path: &str) -> Result<(), Box<dyn Error>> {
     let mut message_objects = i18n.to_message_objects();
     let mut wtr = csv::Writer::from_path(path)?;
