@@ -16,5 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Run tests
+    - name: Run tests with bench
+      run: cargo test --bench bench --verbose
+    - name: test doc and unit test
       run: cargo test --verbose
