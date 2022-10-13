@@ -13,11 +13,15 @@ The I18n project is for solving the problem of I18n in application or system.
 
 It provides a simple api and model to define the I18n value.
 
-## Usages
+## Doc
+
+See the doc catalogue: [Catalogue.md](./docs/Catalogue.md)
+
+## Simple usages
 
 ### Import the project
 
-TODO
+*The project not stable now.*
 
 ## Test & Doc
 
