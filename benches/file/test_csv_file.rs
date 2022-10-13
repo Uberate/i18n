@@ -70,7 +70,7 @@ fn build_test_i18n() -> I18n {
 
 
     // Build a new i18n instance.
-    let mut i18n = I18n::new("zh-cn".to_string(), true, 2);
+    let mut i18n = I18n::new("zh-cn".to_string(), 2);
     for x in res {
         i18n.register_message_object(x);
     }

@@ -2,7 +2,7 @@ use crate::i18n::{I18n, MessageObject};
 
 #[test]
 fn test_i18n() {
-    let mut i = I18n::new("en".to_string(), true, 2);
+    let mut i = I18n::new("en".to_string(), 2);
     i.register_message(&"test".to_string(),
                        &"test".to_string(),
                        &"test".to_string(),
@@ -78,7 +78,7 @@ fn test_strings_to_message_objects() {
     assert_eq!(res.len(), 2);
 
     // Build a new i18n instance.
-    let mut i18n = I18n::new("zh-cn".to_string(), true, 2);
+    let mut i18n = I18n::new("zh-cn".to_string(), 2);
     for x in res {
         i18n.register_message_object(x);
     }

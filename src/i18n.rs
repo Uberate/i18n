@@ -17,7 +17,7 @@ use std::sync::RwLock;
 /// ## Example
 /// ```rust
 /// use i18n::i18n::I18n;
-/// let mut i = I18n::new("en".to_string(), true, 2);
+/// let mut i = I18n::new("en".to_string(), 2);
 /// i.register_message(&"test".to_string(),
 ///                    &"test".to_string(),
 ///                    &"test".to_string(),
@@ -49,7 +49,7 @@ impl I18n {
     /// ## Example
     /// ```rust
     /// use i18n::i18n::I18n;
-    /// let mut i = I18n::new("en".to_string(), true, 2);
+    /// let mut i = I18n::new("en".to_string(), 2);
     /// i.register_message(&"test".to_string(),
     ///                    &"test".to_string(),
     ///                    &"test".to_string(),
@@ -70,12 +70,22 @@ impl I18n {
         }
 
         if language != &self.default_language && self.default_language.len() != 0 {
-            return self.message(namespace, code, language);
+            return self.message(namespace, code, &self.default_language);
         }
 
         None
     }
 
+    /// The to_message_objects function will return a Vec<MessageObject] of all message in current
+    /// [I18n] instance.
+    ///
+    /// ## Example
+    /// ```rust
+    /// use i18n::i18n::I18n;
+    /// let i18n = I18n::default(); // ignore the build age
+    ///
+    /// let messages = i18n.to_message_objects();
+    /// ```
     pub fn to_message_objects(&self) -> Vec<MessageObject> {
         let _ = self.rw_lock.read();
         let mut res = Vec::new();
@@ -116,7 +126,7 @@ impl I18n {
     /// ## Example
     /// ```rust
     /// use i18n::i18n::I18n;
-    /// let mut i = I18n::new("en".to_string(), true, 2);
+    /// let mut i = I18n::new("en".to_string(), 2);
     /// i.register_message(&"test".to_string(),
     ///                    &"test".to_string(),
     ///                    &"test".to_string(),
@@ -170,12 +180,14 @@ impl I18n {
     /// Disable [I18n] change, in feature, it cloud provide a high-performance apis when disable
     /// changed.
     pub fn disable_change(&mut self) {
+        let _ = self.rw_lock.write().unwrap();
         self.enable_change = false
     }
 
     /// Enable [I18n] change, in feature, it cloud provide a lower-performance apis when enable
     /// changed.
     pub fn enable_change(&mut self) {
+        let _ = self.rw_lock.write().unwrap();
         self.enable_change = true
     }
 
@@ -187,11 +199,25 @@ impl I18n {
         self.default_language = default_language
     }
 
+    /// The default function return an [I18n] instance with default settings.
     pub fn default() -> Self {
-        I18n::new("".to_string(), true, 0)
+        I18n::new("".to_string(), 0)
     }
 
-    pub fn new(default_language: String, enable_change: bool, mut read_thread_count: i8) -> Self {
+    /// The new function return an [I18n] instance with specify settings.
+    ///
+    /// ## Params
+    /// - default_language: the default language, it was used at specify message has not value in
+    ///                     specify language.
+    /// - read_thread_count: the [I18n] is thread-safe, it set the max count of read thread to get
+    ///                     message.
+    ///
+    /// ## Example
+    /// ```rust
+    /// use i18n::i18n::I18n;
+    /// let mut i18n_instance = I18n::new("en".to_string(), 2);
+    /// ```
+    pub fn new(default_language: String, mut read_thread_count: i8) -> Self {
         // if read_thread_count <= 0, reset to default '10'
         if read_thread_count <= 0 {
             read_thread_count = 5
@@ -199,7 +225,7 @@ impl I18n {
         I18n {
             messages: HashMap::new(),
             default_language,
-            enable_change,
+            enable_change: true,
             rw_lock: RwLock::new(read_thread_count),
         }
     }
