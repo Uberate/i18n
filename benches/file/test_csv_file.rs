@@ -5,8 +5,13 @@ use i18n::i18n::{I18n, MessageObject};
 fn test_build_from_csv() {
     let res = build_from_csv_file("./target/test_output_i18n.csv");
     match res {
-        Ok(_) => {
-            ()
+        Ok(i18n) => {
+            if let Some(message) = i18n.message(
+                &"test".to_string(),
+                &"test".to_string(),
+                &"en".to_string()) {
+                assert_eq!(message, &"en-test".to_string())
+            }
         }
         Err(e) => {
             panic!("{}", e)

@@ -187,6 +187,10 @@ impl I18n {
         self.default_language = default_language
     }
 
+    pub fn default() -> Self {
+        I18n::new("".to_string(), true, 0)
+    }
+
     pub fn new(default_language: String, enable_change: bool, mut read_thread_count: i8) -> Self {
         // if read_thread_count <= 0, reset to default '10'
         if read_thread_count <= 0 {

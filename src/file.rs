@@ -25,12 +25,22 @@ use crate::i18n::{I18n, MessageObject};
 /// file read error, or csv value error.
 pub fn build_from_csv_file(path: &str) -> Result<I18n, Box<dyn Error>> {
     let mut rdr = csv::Reader::from_path(path)?;
+    let mut strings: Vec<Vec<String>> = Vec::new();
     for result in rdr.records() {
-        let value = result?;
-        println!("{:?}", value)
+        let values = result?;
+        let mut line: Vec<String> = Vec::new();
+        for value in values.iter() {
+            line.push(value.to_string())
+        }
+        strings.push(line)
     }
+    let strings = strings;
+    let mos = MessageObject::from_strings(&strings);
 
-    Ok(I18n::new("en".to_string(), false, 10))
+    let mut i18n = I18n::default();
+    i18n.register_message_objects(mos);
+
+    Ok(i18n)
 }
 
 
