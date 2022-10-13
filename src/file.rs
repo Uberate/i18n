@@ -33,6 +33,10 @@ pub fn build_from_csv_file(path: &str) -> Result<I18n, Box<dyn Error>> {
     Ok(I18n::new("en".to_string(), false, 10))
 }
 
+
+/// The function write_to_csv_file will write all message from an [I18n] instance. And for help
+/// human read, the message will order by namespace and code.
+///
 pub fn write_to_csv_file(i18n: &I18n, path: &str) -> Result<(), Box<dyn Error>> {
     let mut message_objects = i18n.to_message_objects();
     let mut wtr = csv::Writer::from_path(path)?;
@@ -40,15 +44,14 @@ pub fn write_to_csv_file(i18n: &I18n, path: &str) -> Result<(), Box<dyn Error>> 
         return Ok(());
     }
 
-    let header = message_objects.remove(0);
-    message_objects.sort_by(|a, b| {
+    message_objects.sort_unstable_by(|a, b| {
         let namespace_cmp_res = a.namespace().cmp(b.namespace());
         if namespace_cmp_res != Ordering::Equal {
             return namespace_cmp_res;
         }
         return a.code().cmp(b.code());
     });
-    message_objects.insert(0, header);
+
     let strings_value = MessageObject::message_objects_to_strings(message_objects);
 
     for lines in strings_value {

@@ -202,6 +202,7 @@ impl I18n {
 }
 
 /// The struct MessageObject is contain a message info for all languages.
+#[derive(Debug)]
 pub struct MessageObject {
     namespace: String,
     code: String,
@@ -305,6 +306,46 @@ impl MessageObject {
     }
 
 
+    /// The message_objects_to_strings function will parse a [Vec<MessageObject>], and convert to
+    /// [Vec<Vec<String>>]. The function will insert a header of language index. The language index
+    /// is generate from the message info.
+    ///
+    /// The first and second column is namespace and code. The language always start at third
+    /// column.
+    ///
+    /// ## Example
+    /// ```rust
+    /// use i18n::i18n::MessageObject;
+    /// let mut message_strings: Vec<Vec<String>> = Vec::new();
+    ///     let mut message_header: Vec<String> = Vec::new();
+    ///     message_header.push("namespace".to_string());
+    ///     message_header.push("code".to_string());
+    ///     message_header.push("en".to_string());
+    ///     message_header.push("zh-cn".to_string());
+    ///
+    ///     message_strings.push(message_header);
+    ///
+    ///     let first_value: Vec<String> = Vec::from(
+    ///         ["test".to_string(), "test".to_string(), "en-test".to_string(), "中文".to_string()]
+    ///     );
+    ///     let second_value: Vec<String> = Vec::from(
+    ///         ["test".to_string(), "test2".to_string(), "".to_string(), "空".to_string()]
+    ///     );
+    ///     let third_value: Vec<String> = Vec::from(
+    ///         ["none".to_string(), "none".to_string()]
+    ///     );
+    ///
+    ///     message_strings.push(first_value);
+    ///     message_strings.push(second_value);
+    ///     message_strings.push(third_value);
+    ///
+    ///     let res = MessageObject::from_strings(&message_strings);
+    ///
+    ///     let res = MessageObject::message_objects_to_strings(res);
+    ///
+    ///     // the header is miss, message_strings has a header line.
+    ///     assert_eq!(res.len() + 1, message_strings.len());
+    /// ```
     pub fn message_objects_to_strings(message_objects: Vec<MessageObject>) -> Vec<Vec<String>> {
         let mut res = Vec::new();
 
@@ -359,6 +400,9 @@ impl MessageObject {
         res.insert(0, header_string);
         res
     }
+
+    //--------------------------------------------------
+    // getter and setter
     pub fn namespace(&self) -> &str {
         &self.namespace
     }
@@ -377,5 +421,7 @@ impl MessageObject {
     pub fn set_message(&mut self, message: HashMap<String, String>) {
         self.message = message;
     }
+    // end getter and setter
+    //--------------------------------------------------
 }
 

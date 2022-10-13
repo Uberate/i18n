@@ -36,19 +36,28 @@ fn build_test_i18n() -> I18n {
 
     message_strings.push(message_header);
 
-    let first_value: Vec<String> = Vec::from(
+    let value1: Vec<String> = Vec::from(
         ["test".to_string(), "test".to_string(), "en-test".to_string(), "中文".to_string()]
     );
-    let second_value: Vec<String> = Vec::from(
-        ["test".to_string(), "test2".to_string(), "".to_string(), "空".to_string()]
+    let value2: Vec<String> = Vec::from(
+        ["test".to_string(), "test2".to_string(), "123".to_string(), "".to_string()]
     );
-    let third_value: Vec<String> = Vec::from(
+    let value3: Vec<String> = Vec::from(
+        ["test2".to_string(), "test2".to_string(), "".to_string(), "v2".to_string()]
+    );
+    let value4: Vec<String> = Vec::from(
+        ["test2".to_string(), "test".to_string(), "ttt".to_string(), "a1".to_string()]
+    );
+    let value5: Vec<String> = Vec::from(
         ["none".to_string(), "none".to_string()]
     );
 
-    message_strings.push(first_value);
-    message_strings.push(second_value);
-    message_strings.push(third_value);
+    message_strings.push(value4);
+    message_strings.push(value1);
+    message_strings.push(value3);
+    message_strings.push(value5);
+    message_strings.push(value2);
+
 
     let message_strings = message_strings;
 
