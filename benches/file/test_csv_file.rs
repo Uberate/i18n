@@ -1,9 +1,9 @@
-use i18n::file::{build_from_csv_file, write_to_csv_file};
+use i18n::file::{from_csv_file, to_csv_file};
 use i18n::i18n::{I18n, MessageObject};
 
 #[test]
 fn test_build_from_csv() {
-    let res = build_from_csv_file("./target/test_output_i18n.csv");
+    let res = from_csv_file("./target/test_output_i18n.csv");
     match res {
         Ok(i18n) => {
             if let Some(message) = i18n.message(
@@ -22,7 +22,7 @@ fn test_build_from_csv() {
 #[test]
 fn test_write_to_csv() {
     let i18n_value = build_test_i18n();
-    let res = write_to_csv_file(&i18n_value, "./target/test_output_i18n.csv");
+    let res = to_csv_file(&i18n_value, "./target/test_output_i18n.csv");
     match res {
         Err(e) => {
             panic!("{}", e)

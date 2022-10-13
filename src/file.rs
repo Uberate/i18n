@@ -6,7 +6,7 @@ use std::error::Error;
 
 use crate::i18n::{I18n, MessageObject};
 
-/// The function build_from_csv_file will build a I18n instance from a csv file. The csv file must
+/// The function from_csv_file will build a I18n instance from a csv file. The csv file must
 /// has a header to define the column language info. The csv file cloud be like this:
 ///
 /// ```csv
@@ -23,7 +23,7 @@ use crate::i18n::{I18n, MessageObject};
 /// If some option is empty but with some 'space', it will not be skipped. The I18n builder will
 /// drop empty line. And if some error occur at build time, the error will be returned. Such like
 /// file read error, or csv value error.
-pub fn build_from_csv_file(path: &str) -> Result<I18n, Box<dyn Error>> {
+pub fn from_csv_file(path: &str) -> Result<I18n, Box<dyn Error>> {
     let mut rdr = csv::Reader::from_path(path)?;
     let mut strings: Vec<Vec<String>> = Vec::new();
     for result in rdr.records() {
@@ -44,12 +44,12 @@ pub fn build_from_csv_file(path: &str) -> Result<I18n, Box<dyn Error>> {
 }
 
 
-/// The function write_to_csv_file will write all message from an [I18n] instance. And for help
+/// The function to_csv_file will write all message from an [I18n] instance. And for help
 /// human read, the message will order by namespace and code.
 ///
-/// About the format, see the doc of [build_from_csv_file] function. If specify file is exists, the
+/// About the format, see the doc of [from_csv_file] function. If specify file is exists, the
 /// file value will be covered. If the dir path not found, return the err.
-pub fn write_to_csv_file(i18n: &I18n, path: &str) -> Result<(), Box<dyn Error>> {
+pub fn to_csv_file(i18n: &I18n, path: &str) -> Result<(), Box<dyn Error>> {
     let mut message_objects = i18n.to_message_objects();
     let mut wtr = csv::Writer::from_path(path)?;
     if message_objects.len() == 0 {
