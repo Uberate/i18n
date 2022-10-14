@@ -76,6 +76,12 @@ impl I18n {
         None
     }
 
+    /// merge will copy value from other [I18n] instance. If specify value is already exists, use
+    /// other cover current [I18n] instance.
+    pub fn merge(&mut self, other: &I18n) {
+        self.register_message_objects(other.to_message_objects());
+    }
+
     /// The to_message_objects function will return a Vec<MessageObject] of all message in current
     /// [I18n] instance.
     ///
