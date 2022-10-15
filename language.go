@@ -3,11 +3,11 @@ package i18n
 import "strings"
 
 const (
-	CustomStandard = "Custom standard" // None value or unknown standard
-	ISO6391        = "ISO 639-1"       // The ISO 639-1, the WIKI: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-	ISO6392B       = "ISO 639-2 B"     // The ISO 639-2 B, is a type of ISO 639-2, the WIKI: https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
-	ISO6392T       = "ISO 639-2 T"     // The ISO 639-2 T, is a type of ISO 639-2, the WIKI: https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
-	ISO6393        = "ISO 639-3"
+	Custom   = "Custom"      // None value for the default value.
+	ISO6391  = "ISO 639-1"   // The ISO 639-1, the WIKI: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+	ISO6392B = "ISO 639-2 B" // The ISO 639-2 B, is a type of ISO 639-2, the WIKI: https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
+	ISO6392T = "ISO 639-2 T" // The ISO 639-2 T, is a type of ISO 639-2, the WIKI: https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
+	ISO6393  = "ISO 639-3"
 )
 
 // NewLanguageKey return a *LanguageKey.
@@ -15,7 +15,7 @@ func NewLanguageKey() *LanguageKey {
 	return &LanguageKey{}
 }
 
-// LanguageKey represent a language value in I18n system. It can convert to different standard.
+// LanguageKey represent a language value in AbsI18n system. It can convert to different standard.
 type LanguageKey struct {
 	DefaultStandard string            `json:"default_standard" yaml:"default_standard" mapstructure:"default_standard"`
 	Keys            map[string]string `json:"Keys" yaml:"Keys" mapstructure:"Keys"`
@@ -78,14 +78,14 @@ var (
 	//--------------------------------------------------
 	// todo: should generate it by generator.
 
-	ChineseLn  = NewLanguageKey().Push(ISO6391, "zh").Push(ISO6392B, "chi").Push(ISO6392T, "zho")
-	EnglishLn  = NewLanguageKey().Push(ISO6391, "en").Push(ISO6392B, "en").Push(ISO6392T, "en")
-	JapaneseLn = NewLanguageKey().Push(ISO6391, "ja").Push(ISO6392B, "jpn").Push(ISO6392T, "jpn")
+	ChineseLn  = *(NewLanguageKey().Push(Custom, "chinese").Push(ISO6391, "zh").Push(ISO6392B, "chi").Push(ISO6392T, "zho"))
+	EnglishLn  = *(NewLanguageKey().Push(Custom, "english").Push(ISO6391, "en").Push(ISO6392B, "en").Push(ISO6392T, "en"))
+	JapaneseLn = *(NewLanguageKey().Push(Custom, "japanese").Push(ISO6391, "ja").Push(ISO6392B, "jpn").Push(ISO6392T, "jpn"))
 
 	Mapper = map[string]*LanguageKey{
-		"chinese":  ChineseLn,
-		"english":  EnglishLn,
-		"japanese": JapaneseLn,
+		ChineseLn.Lower(Custom):  &ChineseLn,
+		EnglishLn.Lower(Custom):  &EnglishLn,
+		JapaneseLn.Lower(Custom): &JapaneseLn,
 	}
 	//--------------------------------------------------
 )
