@@ -13,27 +13,5 @@ The I18n project is for solving the problem of I18n in application or system.
 
 It provides a simple api and model to define the I18n value.
 
-## Doc
-
-See the doc catalogue: [Catalogue.md](./docs/Catalogue.md)
-
-## Simple usages
-
-### Import the project
-
-*The project not stable now.*
-
-## Test & Doc
-
-The rust doc: The online
-doc: [https://uberate.github.io/i18n/i18n/index.html](https://uberate.github.io/i18n/i18n/index.html)
-
-```bash
-cargo doc
-```
-
-Test code:
-
-```bash
-cargo test
-```
+# Rebuild now
+**The product ready to rebuild by golang**
