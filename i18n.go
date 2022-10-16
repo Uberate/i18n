@@ -10,13 +10,13 @@ type I18n struct {
 	standard        string
 }
 
-// PushMessage will push a message to I18n instance. The flags define the scope.
+// PushMessage will push a message to I18n instance.
 // i.PushMessage(EnglishLn, "test", "namespace", "code") will create a message with two scopes 'namespace' and 'code'.
 // i.PushMessage(EnglishLn, "test", "code") will create a message with one scope 'code'.
 //
 // In this example, the 'namespace' and 'code' is the scope, the Message must have one scope at least. But about max
 // count, the I18n not limit it, but I18n suggest the count of scope should less than 4. If you really need more scope,
-// you can write more flags. But you should think, why you need so much scopes.
+// you can write more scopes. But you should think, why you need so much scopes.
 //
 // PushMessage will push the message, and drop some info of LanguageKey. The I18n think, in one system, only one
 // standard should be used. If you have more than one standard, you should use two instance.
@@ -25,13 +25,13 @@ type I18n struct {
 // emtpy, the message will be deleted. See Message.PushMessage.
 //
 // Note that the PushMessage not thread-safe.
-func (i *I18n) PushMessage(ln LanguageKey, messageValue string, flags ...string) {
-	i.PushMessageByString(ln.Lower(i.standard), messageValue, flags...)
+func (i *I18n) PushMessage(ln LanguageKey, messageValue string, scopes ...string) {
+	i.PushMessageByString(ln.Lower(i.standard), messageValue, scopes...)
 }
 
 // PushMessageByString like PushMessage, but it receives the string as language key.
-func (i *I18n) PushMessageByString(ln string, message string, flags ...string) {
-	i.values.PushMessage(ln, message, flags...)
+func (i *I18n) PushMessageByString(ln string, message string, scopes ...string) {
+	i.values.PushMessage(ln, message, scopes...)
 }
 
 // SetStandard will update inner standard, but for message which already in, the ln will not be change. It only effects
@@ -44,30 +44,36 @@ func (i *I18n) Standard() string {
 	return i.standard
 }
 
-func (i *I18n) Message(ln LanguageKey, flags ...string) (string, bool) {
-	return i.MessageByString(ln.Lower(i.standard), flags...)
+// Message return the message of specify language and scopes. If value not found, return empty and false.
+//
+// If the I18n standard changed, the value maybe not found.
+func (i *I18n) Message(ln LanguageKey, scopes ...string) (string, bool) {
+	return i.MessageByString(ln.Lower(i.standard), scopes...)
 }
 
-func (i *I18n) MessageByString(ln string, flags ...string) (string, bool) {
-	return i.values.Message(ln, flags...)
+// MessageByString like Message, but it receives string as language key.
+func (i *I18n) MessageByString(ln string, scopes ...string) (string, bool) {
+	return i.values.Message(ln, scopes...)
 }
 
-func (i *I18n) Pusher(flags ...string) Pusher {
+// Pusher help to quick build I18n message. It returns a func to add different language message to specify scopes.
+func (i *I18n) Pusher(scopes ...string) Pusher {
 	return func(ln LanguageKey, messageValue string) {
-		i.PushMessage(ln, messageValue, flags...)
+		i.PushMessage(ln, messageValue, scopes...)
 	}
 }
 
-func (i *I18n) PusherByString(flags ...string) PusherByString {
+// PusherByString like Pusher, but the PusherByString receives the string as language key.
+func (i *I18n) PusherByString(scopes ...string) PusherByString {
 	return func(ln string, messageValue string) {
-		i.PushMessageByString(ln, messageValue, flags...)
+		i.PushMessageByString(ln, messageValue, scopes...)
 	}
 }
 
 type AbsI18n interface {
 	Message(ln string, levelCodes ...string) (string, bool)
-	PushMessage(ln, messageValue string, flags ...string)
-	Pusher(flags ...string) func(string, string)
+	PushMessage(ln, messageValue string, scopes ...string)
+	Pusher(scopes ...string) func(string, string)
 }
 
 type Namespace struct {
@@ -77,9 +83,9 @@ type Namespace struct {
 }
 
 // Pusher is a specify iterator implements. It used to register value.
-func (namespace *Namespace) Pusher(flags ...string) func(string, string) {
+func (namespace *Namespace) Pusher(scopes ...string) func(string, string) {
 	return func(ln, messageValue string) {
-		namespace.PushMessage(ln, messageValue, flags...)
+		namespace.PushMessage(ln, messageValue, scopes...)
 	}
 }
 
