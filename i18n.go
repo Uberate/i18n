@@ -1,12 +1,23 @@
 package i18n
 
 func NewI18n(standard string) *I18n {
+	if len(standard) == 0 {
+		standard = Custom
+	}
 	return &I18n{
 		standard: standard,
 		values:   &Namespace{},
 	}
 }
 
+// I18n is core struct of i18n project. It save all message info.
+//
+// I18n will drop the language detail info of a LanguageKey. It will save the language string value by I18n.Standard.
+// You can change standard, but the old message will not be updated. If you want to use different Standard, please use
+// different I18n instance to do it.
+//
+// I18n is not thread-safe, the I18n message should build at application bootstrap age. After bootstrap, the I18n info
+// should not change(the tools of I18n except).
 type I18n struct {
 	values *Namespace
 
@@ -14,10 +25,19 @@ type I18n struct {
 	standard        string
 }
 
+//--------------------------------------------------
+// Helper function define start.
+
 type Pusher func(ln LanguageKey, messageValue string)
 type IPusher func(ln LanguageKey, messageValue string) IPusher
 type PusherByString func(ln string, messageValue string)
 type IPusherByString func(ln, messageValue string) IPusherByString
+
+// Helper function define end.
+//--------------------------------------------------
+
+//--------------------------------------------------
+// Helper struct define start.
 
 type messageBuilder struct {
 	push Pusher
@@ -36,6 +56,9 @@ func (mb *messageStringBuilder) Push(key, message string) *messageStringBuilder 
 	mb.push(key, message)
 	return mb
 }
+
+// Helper struct define end.
+//--------------------------------------------------
 
 // PushMessage will push a message to I18n instance.
 // i.PushMessage(EnglishLn, "test", "namespace", "code") will create a message with two scopes 'namespace' and 'code'.
@@ -67,6 +90,7 @@ func (i *I18n) SetStandard(standard string) {
 	i.standard = standard
 }
 
+// Standard return the standard of current I18n instance.
 func (i *I18n) Standard() string {
 	return i.standard
 }
@@ -90,6 +114,9 @@ func (i *I18n) Pusher(scopes ...string) Pusher {
 	}
 }
 
+// IPusher like Pusher, but it returns IPusher function. The IPusher can invoke more times like it:
+// iPusher := i18n.IPusher("test")
+// iPusher(EnglishLn, "test")("ChineseLn", "测试")
 func (i *I18n) IPusher(scopes ...string) IPusher {
 	return func(ln LanguageKey, messageValue string) IPusher {
 		i.PushMessage(ln, messageValue, scopes...)
@@ -104,22 +131,34 @@ func (i *I18n) PusherByString(scopes ...string) PusherByString {
 	}
 }
 
+// IPusherByString like IPusher, but the IPusherByString receives the string as language key.
+func (i *I18n) IPusherByString(scopes ...string) IPusherByString {
+	return func(ln, messageValue string) IPusherByString {
+		i.PushMessageByString(ln, messageValue)
+		return i.IPusherByString(scopes...)
+	}
+}
+
+// MessageBuilder return a builder for specify scopes.
 func (i *I18n) MessageBuilder(scopes ...string) *messageBuilder {
 	return &messageBuilder{
 		push: i.Pusher(scopes...),
 	}
 }
 
+// MessageStringBuilder return a builder for specify scopes.
 func (i *I18n) MessageStringBuilder(scopes ...string) *messageStringBuilder {
 	return &messageStringBuilder{
 		push: i.PusherByString(scopes...),
 	}
 }
 
+// WalkRecord will for-each all message language-value.
 func (i *I18n) WalkRecord(f func(languageValue, messageValue string, flags ...string)) {
 	i.values.WalkRecord(f)
 }
 
+// WalkMessage will for-each all message value.
 func (i *I18n) WalkMessage(f func(message map[string]string, flags ...string)) {
 	i.values.WalkMessage(f)
 }
