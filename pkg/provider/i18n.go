@@ -184,6 +184,13 @@ func (i *I18n) IsSub(b *I18n) bool {
 	return res
 }
 
+// CoveredMessage will use b to cover current value.
+func (i *I18n) CoveredMessage(b *I18n) {
+	b.WalkRecord(func(languageValue, messageValue string, flags ...string) {
+		i.PushMessageByString(languageValue, messageValue, flags...)
+	})
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 const scopeHeaderPrefix = "_"
