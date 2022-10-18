@@ -5,24 +5,23 @@ func NewI18n(standard string) *I18n {
 		standard = Custom
 	}
 	return &I18n{
-		standard: standard,
-		values:   &Namespace{},
+		Standard: standard,
+		Values:   NewNamespace(),
 	}
 }
 
-// I18n is core struct of i18n project. It save all message info.
+// I18n is core struct of i18n project. It save all MessageValue info.
 //
 // I18n will drop the language detail info of a LanguageKey. It will save the language string value by I18n.Standard.
-// You can change standard, but the old message will not be updated. If you want to use different Standard, please use
+// You can change Standard, but the old MessageValue will not be updated. If you want to use different Standard, please use
 // different I18n instance to do it.
 //
-// I18n is not thread-safe, the I18n message should build at application bootstrap age. After bootstrap, the I18n info
+// I18n is not thread-safe, the I18n MessageValue should build at application bootstrap age. After bootstrap, the I18n info
 // should not change(the tools of I18n except).
 type I18n struct {
-	values *Namespace
-
-	defaultLanguage LanguageKey
-	standard        string
+	Values          *Namespace  `yaml:"values" json:"values"`
+	DefaultLanguage LanguageKey `yaml:"default_language" json:"default_language"`
+	Standard        string      `yaml:"standard" json:"standard"`
 }
 
 //--------------------------------------------------
@@ -60,54 +59,43 @@ func (mb *messageStringBuilder) Push(key, message string) *messageStringBuilder 
 // Helper struct define end.
 //--------------------------------------------------
 
-// PushMessage will push a message to I18n instance.
-// i.PushMessage(EnglishLn, "test", "namespace", "code") will create a message with two scopes 'namespace' and 'code'.
-// i.PushMessage(EnglishLn, "test", "code") will create a message with one scope 'code'.
+// PushMessage will push a MessageValue to I18n instance.
+// i.PushMessage(EnglishLn, "test", "namespace", "code") will create a MessageValue with two scopes 'namespace' and 'code'.
+// i.PushMessage(EnglishLn, "test", "code") will create a MessageValue with one scope 'code'.
 //
 // In this example, the 'namespace' and 'code' is the scope, the Message must have one scope at least. But about max
 // count, the I18n not limit it, but I18n suggest the count of scope should less than 4. If you really need more scope,
 // you can write more scopes. But you should think, why you need so much scopes.
 //
-// PushMessage will push the message, and drop some info of LanguageKey. The I18n think, in one system, only one
-// standard should be used. If you have more than one standard, you should use two instance.
+// PushMessage will push the MessageValue, and drop some info of LanguageKey. The I18n think, in one system, only one
+// Standard should be used. If you have more than one Standard, you should use two instance.
 //
-// If specify message already haven value, the new message will cover it directly. Specify if the input message value is
-// emtpy, the message will be deleted. See Message.PushMessage.
+// If specify MessageValue already haven value, the new MessageValue will cover it directly. Specify if the input MessageValue value is
+// emtpy, the MessageValue will be deleted. See Message.PushMessage.
 //
 // Note that the PushMessage not thread-safe.
 func (i *I18n) PushMessage(ln LanguageKey, messageValue string, scopes ...string) {
-	i.PushMessageByString(ln.Lower(i.standard), messageValue, scopes...)
+	i.PushMessageByString(ln.Lower(i.Standard), messageValue, scopes...)
 }
 
 // PushMessageByString like PushMessage, but it receives the string as language key.
 func (i *I18n) PushMessageByString(ln string, message string, scopes ...string) {
-	i.values.PushMessage(ln, message, scopes...)
+	i.Values.PushMessage(ln, message, scopes...)
 }
 
-// SetStandard will update inner standard, but for message which already in, the ln will not be change. It only effects
-// new message info. And the I18n.Message maybe return empty with false.
-func (i *I18n) SetStandard(standard string) {
-	i.standard = standard
-}
-
-// Standard return the standard of current I18n instance.
-func (i *I18n) Standard() string {
-	return i.standard
-}
-
-// Message return the message of specify language and scopes. If value not found, return empty and false.
+// Message return the MessageValue of specify language and scopes. If value not found, return empty and false.
 //
-// If the I18n standard changed, the value maybe not found.
+// If the I18n Standard changed, the value maybe not found.
 func (i *I18n) Message(ln LanguageKey, scopes ...string) (string, bool) {
-	return i.MessageByString(ln.Lower(i.standard), scopes...)
+	return i.MessageByString(ln.Lower(i.Standard), scopes...)
 }
 
 // MessageByString like Message, but it receives string as language key.
 func (i *I18n) MessageByString(ln string, scopes ...string) (string, bool) {
-	return i.values.Message(ln, scopes...)
+	return i.Values.Message(ln, scopes...)
 }
 
-// Pusher help to quick build I18n message. It returns a func to add different language message to specify scopes.
+// Pusher help to quick build I18n MessageValue. It returns a func to add different language MessageValue to specify scopes.
 func (i *I18n) Pusher(scopes ...string) Pusher {
 	return func(ln LanguageKey, messageValue string) {
 		i.PushMessage(ln, messageValue, scopes...)
@@ -153,24 +141,63 @@ func (i *I18n) MessageStringBuilder(scopes ...string) *messageStringBuilder {
 	}
 }
 
-// WalkRecord will for-each all message language-value.
+// WalkRecord will for-each all MessageValue language-value.
 func (i *I18n) WalkRecord(f func(languageValue, messageValue string, flags ...string)) {
-	i.values.WalkRecord(f)
+	i.Values.WalkRecord(f)
 }
 
-// WalkMessage will for-each all message value.
+// WalkMessage will for-each all MessageValue value.
 func (i *I18n) WalkMessage(f func(message map[string]string, flags ...string)) {
-	i.values.WalkMessage(f)
+	i.Values.WalkMessage(f)
+}
+
+// Equals return true when i.message == b.message. And if a == b == nil, return true
+// Else if (i == b && b != nil) || (a != nil || b == nil) return false.
+func (i *I18n) Equals(b *I18n) bool {
+	if i == b {
+		return true
+	}
+	if i == nil || b == nil {
+		return false
+	}
+	return i.IsSub(b) && b.IsSub(i)
+}
+
+// IsSub return true when current instance all infos can find from b. And if a == b == nil, return true
+// Else if (i == b && b != nil) || (a != nil || b == nil) return false.
+func (i *I18n) IsSub(b *I18n) bool {
+	if i == b {
+		return true
+	}
+	if i == nil || b == nil {
+		return false
+	}
+	res := true
+	i.WalkRecord(func(languageValue, messageValue string, flags ...string) {
+		if res {
+			if currentValue, ok := b.MessageByString(languageValue, flags...); !ok || currentValue != messageValue {
+				res = false
+			}
+		}
+	})
+	return res
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const scopeHeaderPrefix = "_"
 
+func NewNamespace() *Namespace {
+	return &Namespace{
+		Children: map[string]*Namespace{},
+		Messages: NewMessage(),
+	}
+}
+
 type Namespace struct {
 	// MessageSave the
-	Children map[string]*Namespace
-	Messages map[string]*Message
+	Children map[string]*Namespace `yaml:"children" json:"children"`
+	Messages *Message              `yaml:"messages" json:"messages"`
 }
 
 func (namespace *Namespace) WalkRecord(f func(ln, messageValue string, flags ...string)) {
@@ -186,10 +213,10 @@ func (namespace *Namespace) WalkMessage(f func(message map[string]string, flags 
 }
 
 func (namespace *Namespace) walkMessage(f func(message map[string]string, flags ...string), parentFlags ...string) {
-	for scope, message := range namespace.Messages {
-		flags := append(parentFlags, scope)
-		f(message.message, flags...)
+	if parentFlags == nil {
+		parentFlags = []string{}
 	}
+	f(namespace.Messages.MessageValue, parentFlags...)
 
 	for scope, child := range namespace.Children {
 		newScope := append(parentFlags, scope)
@@ -206,18 +233,10 @@ func (namespace *Namespace) Pusher(scopes ...string) func(string, string) {
 
 func (namespace *Namespace) Message(ln string, levelCodes ...string) (string, bool) {
 
-	// not value, return empty value and false
 	if len(levelCodes) == 0 {
-		return "", false
+		return namespace.Messages.Message(ln)
 	}
 	currentLevelCode := levelCodes[0]
-
-	// search value in current scope
-	if len(levelCodes) == 1 {
-		if value, ok := namespace.Messages[currentLevelCode]; ok {
-			return value.Message(ln)
-		}
-	}
 
 	if value, ok := namespace.Children[currentLevelCode]; ok {
 
@@ -235,50 +254,41 @@ func (namespace *Namespace) PushMessage(ln, messageValue string, levelCodes ...s
 
 	// not value, return empty value and false
 	if len(levelCodes) == 0 {
-		// no found the scope
-		return
-	}
-
-	// Only has one code, save it as Message
-	if len(levelCodes) == 1 {
-		if namespace.Messages[levelCodes[0]] == nil {
-			namespace.Messages[levelCodes[0]] = &Message{
-				message: map[string]string{},
-			}
-		}
-
-		namespace.Messages[levelCodes[0]].PushMessage(ln, messageValue)
+		namespace.Messages.PushMessage(ln, messageValue)
 		return
 	}
 
 	// Try to push to children, if not contain this flag, push a new one.
 	if _, ok := namespace.Children[levelCodes[0]]; !ok {
-		namespace.Children[levelCodes[0]] = &Namespace{
-			Children: map[string]*Namespace{},
-			Messages: map[string]*Message{},
-		}
+		namespace.Children[levelCodes[0]] = NewNamespace()
 	}
 
 	namespace.Children[levelCodes[0]].PushMessage(ln, messageValue, levelCodes[1:]...)
 }
 
 type Message struct {
-	message map[string]string
+	MessageValue map[string]string `json:"message_value" yaml:"message_value"`
+}
+
+func NewMessage() *Message {
+	return &Message{
+		MessageValue: map[string]string{},
+	}
 }
 
 func (m *Message) Message(ln string) (string, bool) {
-	value, ok := m.message[ln]
+	value, ok := m.MessageValue[ln]
 	return value, ok
 }
 
 func (m *Message) PushMessage(ln, messageValue string) {
-	if m.message == nil {
-		m.message = map[string]string{}
+	if m.MessageValue == nil {
+		m.MessageValue = map[string]string{}
 	}
 
 	if len(messageValue) == 0 {
-		delete(m.message, ln)
+		delete(m.MessageValue, ln)
 	} else {
-		m.message[ln] = messageValue
+		m.MessageValue[ln] = messageValue
 	}
 }

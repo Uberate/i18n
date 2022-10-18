@@ -16,32 +16,32 @@ func NewLanguageKey() *LanguageKey {
 	return &LanguageKey{}
 }
 
-// LanguageKey represent a language value in AbsI18n system. It can convert to different standard.
+// LanguageKey represent a language value in AbsI18n system. It can convert to different Standard.
 type LanguageKey struct {
 	DefaultStandard string            `json:"default_standard" yaml:"default_standard" mapstructure:"default_standard"`
 	Keys            map[string]string `json:"Keys" yaml:"Keys" mapstructure:"Keys"`
 }
 
-// Upper return an upper language key value by standard. If current LanguageKey doesn't have this standard value, try to
-// find value from LanguageKey.DefaultStandard. If default standard not has value too, return empty value.
+// Upper return an upper language key value by Standard. If current LanguageKey doesn't have this Standard value, try to
+// find value from LanguageKey.DefaultStandard. If default Standard not has value too, return empty value.
 func (lk *LanguageKey) Upper(standard string) string {
 	return strings.ToUpper(lk.Key(standard))
 }
 
-// Lower return a lower language key value by standard. If current LanguageKey doesn't have this standard value, try to
-// find value from LanguageKey.DefaultStandard. If default standard not has value too, return empty value.
+// Lower return a lower language key value by Standard. If current LanguageKey doesn't have this Standard value, try to
+// find value from LanguageKey.DefaultStandard. If default Standard not has value too, return empty value.
 func (lk *LanguageKey) Lower(standard string) string {
 	return strings.ToLower(lk.Key(standard))
 }
 
-// Key return the language key value by standard. If current LanguageKey doesn't have this standard value, try to
-// find value from LanguageKey.DefaultStandard. If default standard not has value too, return empty value.
+// Key return the language key value by Standard. If current LanguageKey doesn't have this Standard value, try to
+// find value from LanguageKey.DefaultStandard. If default Standard not has value too, return empty value.
 func (lk *LanguageKey) Key(standard string) string {
 	if value, ok := lk.Keys[standard]; ok {
 		return value
 	}
 
-	// If not found specify standard and default standard not nil, try to return default standard key.
+	// If not found specify Standard and default Standard not nil, try to return default Standard key.
 	// If input is default, return empty string directly.
 	if len(lk.DefaultStandard) != 0 && lk.DefaultStandard != standard {
 		return lk.Key(lk.DefaultStandard)
@@ -50,14 +50,14 @@ func (lk *LanguageKey) Key(standard string) string {
 	return ""
 }
 
-// SetDefaultStandard will update the default standard.
+// SetDefaultStandard will update the default Standard.
 func (lk *LanguageKey) SetDefaultStandard(defaultStandard string) *LanguageKey {
 	lk.DefaultStandard = defaultStandard
 	return lk
 }
 
-// Push will push a standard value to current LanguageKey. And if LanguageKey.DefaultStandard is emtpy, set the value
-// to this standard. The value can be changed in anywhere.
+// Push will push a Standard value to current LanguageKey. And if LanguageKey.DefaultStandard is emtpy, set the value
+// to this Standard. The value can be changed in anywhere.
 func (lk *LanguageKey) Push(standard, value string) *LanguageKey {
 
 	if len(lk.DefaultStandard) == 0 {

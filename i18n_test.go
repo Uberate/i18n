@@ -1,6 +1,7 @@
 package i18n
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -16,6 +17,28 @@ func Init() {
 	p(ChineseLn, "未知错误")
 	ip := BaseI18nValue.IPusher("user", "text", "test")
 	ip(EnglishLn, "test")(ChineseLn, "测试")
+}
+
+func TestToJson(t *testing.T) {
+	Init()
+	value, err := ToJSON(BaseI18nValue)
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := FromJson(value)
+	if err != nil {
+		t.Error(err)
+	}
+	if !res.Equals(BaseI18nValue) {
+		t.Error("Res should equals BaseI18nValue. But not.")
+		return
+	}
+	res.PushMessage(EnglishLn, "test", "test")
+	if res.Equals(BaseI18nValue) {
+		t.Error("Res should different from BaseI18nValue. But not.")
+		fmt.Println(ToJSON(res))
+		fmt.Println(ToJSON(BaseI18nValue))
+	}
 }
 
 func TestToStrings(t *testing.T) {
