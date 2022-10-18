@@ -6,6 +6,8 @@
 
 Project status:
 
+[![code-test](https://github.com/Uberate/i18n/actions/workflows/code-test.yml/badge.svg?branch=main)](https://github.com/Uberate/i18n/actions/workflows/code-test.yml)
+
 The I18n project is for solving the problem of I18n in application or system.
 
 It provides a simple api and model to define the I18n value.
