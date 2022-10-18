@@ -1,4 +1,5 @@
 // GENERATOR, DO NOT EDIT!
+
 package i18n
 
 var (
