@@ -1,10 +1,5 @@
 package i18n
 
-type Pusher func(ln LanguageKey, messageValue string)
-type IPusher func(ln LanguageKey, messageValue string) IPusher
-type PusherByString func(ln string, messageValue string)
-type IPusherByString func(ln, messageValue string) IPusherByString
-
 func NewI18n(standard string) *I18n {
 	return &I18n{
 		standard: standard,
@@ -17,6 +12,29 @@ type I18n struct {
 
 	defaultLanguage LanguageKey
 	standard        string
+}
+
+type Pusher func(ln LanguageKey, messageValue string)
+type IPusher func(ln LanguageKey, messageValue string) IPusher
+type PusherByString func(ln string, messageValue string)
+type IPusherByString func(ln, messageValue string) IPusherByString
+
+type messageBuilder struct {
+	push Pusher
+}
+
+func (mb *messageBuilder) Push(key LanguageKey, message string) *messageBuilder {
+	mb.push(key, message)
+	return mb
+}
+
+type messageStringBuilder struct {
+	push PusherByString
+}
+
+func (mb *messageStringBuilder) Push(key, message string) *messageStringBuilder {
+	mb.push(key, message)
+	return mb
 }
 
 // PushMessage will push a message to I18n instance.
@@ -83,6 +101,18 @@ func (i *I18n) IPusher(scopes ...string) IPusher {
 func (i *I18n) PusherByString(scopes ...string) PusherByString {
 	return func(ln string, messageValue string) {
 		i.PushMessageByString(ln, messageValue, scopes...)
+	}
+}
+
+func (i *I18n) MessageBuilder(scopes ...string) *messageBuilder {
+	return &messageBuilder{
+		push: i.Pusher(scopes...),
+	}
+}
+
+func (i *I18n) MessageStringBuilder(scopes ...string) *messageStringBuilder {
+	return &messageStringBuilder{
+		push: i.PusherByString(scopes...),
 	}
 }
 
