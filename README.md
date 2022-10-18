@@ -11,6 +11,3 @@ Project status:
 The I18n project is for solving the problem of I18n in application or system.
 
 It provides a simple api and model to define the I18n value.
-
-# Rebuild now
-**The product ready to rebuild by golang**
