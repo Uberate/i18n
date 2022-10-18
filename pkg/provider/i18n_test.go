@@ -1,7 +1,8 @@
-package i18n
+package provider
 
 import (
 	"fmt"
+	"github.com/uberate/i18n/pkg"
 	"testing"
 )
 
@@ -21,11 +22,11 @@ func Init() {
 
 func TestToJson(t *testing.T) {
 	Init()
-	value, err := ToJSON(BaseI18nValue)
+	value, err := pkg.ToJSON(BaseI18nValue)
 	if err != nil {
 		t.Error(err)
 	}
-	res, err := FromJson(value)
+	res, err := pkg.FromJson(value)
 	if err != nil {
 		t.Error(err)
 	}
@@ -36,8 +37,8 @@ func TestToJson(t *testing.T) {
 	res.PushMessage(EnglishLn, "test", "test")
 	if res.IsMessageEquals(BaseI18nValue) {
 		t.Error("Res should different from BaseI18nValue. But not.")
-		fmt.Println(ToJSON(res))
-		fmt.Println(ToJSON(BaseI18nValue))
+		fmt.Println(pkg.ToJSON(res))
+		fmt.Println(pkg.ToJSON(BaseI18nValue))
 	}
 }
 

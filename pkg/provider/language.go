@@ -1,4 +1,4 @@
-package i18n
+package provider
 
 //go:generate go run ./tools/code_gen/language_gen.go ./tools/code_gen/language_gen.tpl ./language_key.gen.go
 import "strings"

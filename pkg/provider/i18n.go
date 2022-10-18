@@ -1,4 +1,4 @@
-package i18n
+package provider
 
 func NewI18n(standard string) *I18n {
 	if len(standard) == 0 {
