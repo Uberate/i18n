@@ -1,5 +1,6 @@
 package i18n
 
+//go:generate go run ./tools/code_gen/language_gen.go ./tools/code_gen/language_gen.tpl ./language_key.gen.go
 import "strings"
 
 const (
@@ -74,20 +75,6 @@ func (lk *LanguageKey) Push(standard, value string) *LanguageKey {
 var (
 	// NoneLn is a specify language, it means no language.
 	NoneLn = NewLanguageKey().SetDefaultStandard(ISO6391).Push(ISO6391, "none")
-
-	//--------------------------------------------------
-	// todo: should generate it by generator.
-
-	ChineseLn  = *(NewLanguageKey().Push(Custom, "chinese").Push(ISO6391, "zh").Push(ISO6392B, "chi").Push(ISO6392T, "zho"))
-	EnglishLn  = *(NewLanguageKey().Push(Custom, "english").Push(ISO6391, "en").Push(ISO6392B, "en").Push(ISO6392T, "en"))
-	JapaneseLn = *(NewLanguageKey().Push(Custom, "japanese").Push(ISO6391, "ja").Push(ISO6392B, "jpn").Push(ISO6392T, "jpn"))
-
-	Mapper = map[string]*LanguageKey{
-		ChineseLn.Lower(Custom):  &ChineseLn,
-		EnglishLn.Lower(Custom):  &EnglishLn,
-		JapaneseLn.Lower(Custom): &JapaneseLn,
-	}
-	//--------------------------------------------------
 )
 
 func GetLanguageKey(keyName string) *LanguageKey {
