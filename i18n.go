@@ -13,11 +13,11 @@ func NewI18n(standard string) *I18n {
 // I18n is core struct of i18n project. It save all MessageValue info.
 //
 // I18n will drop the language detail info of a LanguageKey. It will save the language string value by I18n.Standard.
-// You can change Standard, but the old MessageValue will not be updated. If you want to use different Standard, please use
-// different I18n instance to do it.
+// You can change Standard, but the old MessageValue will not be updated. If you want to use different Standard, please
+// use different I18n instance to do it.
 //
-// I18n is not thread-safe, the I18n MessageValue should build at application bootstrap age. After bootstrap, the I18n info
-// should not change(the tools of I18n except).
+// I18n is not thread-safe, the I18n MessageValue should build at application bootstrap age. After bootstrap, the I18n
+// info should not change(the tools of I18n except).
 type I18n struct {
 	Values          *Namespace  `yaml:"values" json:"values"`
 	DefaultLanguage LanguageKey `yaml:"default_language" json:"default_language"`
@@ -70,8 +70,8 @@ func (mb *messageStringBuilder) Push(key, message string) *messageStringBuilder 
 // PushMessage will push the MessageValue, and drop some info of LanguageKey. The I18n think, in one system, only one
 // Standard should be used. If you have more than one Standard, you should use two instance.
 //
-// If specify MessageValue already haven value, the new MessageValue will cover it directly. Specify if the input MessageValue value is
-// emtpy, the MessageValue will be deleted. See Message.PushMessage.
+// If specify MessageValue already haven value, the new MessageValue will cover it directly. Specify if the input
+// MessageValue value is emtpy, the MessageValue will be deleted. See Message.PushMessage.
 //
 // Note that the PushMessage not thread-safe.
 func (i *I18n) PushMessage(ln LanguageKey, messageValue string, scopes ...string) {
@@ -95,7 +95,8 @@ func (i *I18n) MessageByString(ln string, scopes ...string) (string, bool) {
 	return i.Values.Message(ln, scopes...)
 }
 
-// Pusher help to quick build I18n MessageValue. It returns a func to add different language MessageValue to specify scopes.
+// Pusher help to quick build I18n MessageValue. It returns a func to add different language MessageValue to specify
+// scopes.
 func (i *I18n) Pusher(scopes ...string) Pusher {
 	return func(ln LanguageKey, messageValue string) {
 		i.PushMessage(ln, messageValue, scopes...)
