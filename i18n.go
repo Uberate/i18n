@@ -1,10 +1,19 @@
 package i18n
 
 type Pusher func(ln LanguageKey, messageValue string)
+type IPusher func(ln LanguageKey, messageValue string) IPusher
 type PusherByString func(ln string, messageValue string)
+type IPusherByString func(ln, messageValue string) IPusherByString
+
+func NewI18n(standard string) *I18n {
+	return &I18n{
+		standard: standard,
+		values:   &Namespace{},
+	}
+}
 
 type I18n struct {
-	values AbsI18n
+	values *Namespace
 
 	defaultLanguage LanguageKey
 	standard        string
@@ -63,6 +72,13 @@ func (i *I18n) Pusher(scopes ...string) Pusher {
 	}
 }
 
+func (i *I18n) IPusher(scopes ...string) IPusher {
+	return func(ln LanguageKey, messageValue string) IPusher {
+		i.PushMessage(ln, messageValue, scopes...)
+		return i.IPusher(scopes...)
+	}
+}
+
 // PusherByString like Pusher, but the PusherByString receives the string as language key.
 func (i *I18n) PusherByString(scopes ...string) PusherByString {
 	return func(ln string, messageValue string) {
@@ -70,16 +86,46 @@ func (i *I18n) PusherByString(scopes ...string) PusherByString {
 	}
 }
 
-type AbsI18n interface {
-	Message(ln string, levelCodes ...string) (string, bool)
-	PushMessage(ln, messageValue string, scopes ...string)
-	Pusher(scopes ...string) func(string, string)
+func (i *I18n) WalkRecord(f func(languageValue, messageValue string, flags ...string)) {
+	i.values.WalkRecord(f)
 }
+
+func (i *I18n) WalkMessage(f func(message map[string]string, flags ...string)) {
+	i.values.WalkMessage(f)
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const scopeHeaderPrefix = "_"
 
 type Namespace struct {
 	// MessageSave the
-	Children map[string]AbsI18n
+	Children map[string]*Namespace
 	Messages map[string]*Message
+}
+
+func (namespace *Namespace) WalkRecord(f func(ln, messageValue string, flags ...string)) {
+	namespace.WalkMessage(func(message map[string]string, flags ...string) {
+		for ln, message := range message {
+			f(ln, message, flags...)
+		}
+	})
+}
+
+func (namespace *Namespace) WalkMessage(f func(message map[string]string, flags ...string)) {
+	namespace.walkMessage(f)
+}
+
+func (namespace *Namespace) walkMessage(f func(message map[string]string, flags ...string), parentFlags ...string) {
+	for scope, message := range namespace.Messages {
+		flags := append(parentFlags, scope)
+		f(message.message, flags...)
+	}
+
+	for scope, child := range namespace.Children {
+		newScope := append(parentFlags, scope)
+		child.walkMessage(f, newScope...)
+	}
 }
 
 // Pusher is a specify iterator implements. It used to register value.
@@ -115,7 +161,7 @@ func (namespace *Namespace) Message(ln string, levelCodes ...string) (string, bo
 
 func (namespace *Namespace) PushMessage(ln, messageValue string, levelCodes ...string) {
 	if namespace.Children == nil {
-		namespace.Children = map[string]AbsI18n{}
+		namespace.Children = map[string]*Namespace{}
 	}
 
 	// not value, return empty value and false
@@ -126,9 +172,12 @@ func (namespace *Namespace) PushMessage(ln, messageValue string, levelCodes ...s
 
 	// Only has one code, save it as Message
 	if len(levelCodes) == 1 {
-		namespace.Messages[levelCodes[0]] = &Message{
-			message: map[string]string{},
+		if namespace.Messages[levelCodes[0]] == nil {
+			namespace.Messages[levelCodes[0]] = &Message{
+				message: map[string]string{},
+			}
 		}
+
 		namespace.Messages[levelCodes[0]].PushMessage(ln, messageValue)
 		return
 	}
@@ -136,7 +185,7 @@ func (namespace *Namespace) PushMessage(ln, messageValue string, levelCodes ...s
 	// Try to push to children, if not contain this flag, push a new one.
 	if _, ok := namespace.Children[levelCodes[0]]; !ok {
 		namespace.Children[levelCodes[0]] = &Namespace{
-			Children: map[string]AbsI18n{},
+			Children: map[string]*Namespace{},
 			Messages: map[string]*Message{},
 		}
 	}
