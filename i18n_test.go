@@ -29,12 +29,12 @@ func TestToJson(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if !res.Equals(BaseI18nValue) {
+	if !res.IsMessageEquals(BaseI18nValue) {
 		t.Error("Res should equals BaseI18nValue. But not.")
 		return
 	}
 	res.PushMessage(EnglishLn, "test", "test")
-	if res.Equals(BaseI18nValue) {
+	if res.IsMessageEquals(BaseI18nValue) {
 		t.Error("Res should different from BaseI18nValue. But not.")
 		fmt.Println(ToJSON(res))
 		fmt.Println(ToJSON(BaseI18nValue))

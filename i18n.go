@@ -151,9 +151,9 @@ func (i *I18n) WalkMessage(f func(message map[string]string, flags ...string)) {
 	i.Values.WalkMessage(f)
 }
 
-// Equals return true when i.message == b.message. And if a == b == nil, return true
+// IsMessageEquals return true when i.message == b.message. And if a == b == nil, return true
 // Else if (i == b && b != nil) || (a != nil || b == nil) return false.
-func (i *I18n) Equals(b *I18n) bool {
+func (i *I18n) IsMessageEquals(b *I18n) bool {
 	if i == b {
 		return true
 	}
