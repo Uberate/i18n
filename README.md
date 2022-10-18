@@ -1,4 +1,4 @@
-# I18n support for rust
+# I18n support for go
 
 ![Stars](https://img.shields.io/github/stars/Uberate/i18n?label=Stars)
 ![Forks](https://img.shields.io/github/forks/Uberate/i18n?label=Forks)
