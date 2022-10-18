@@ -11,3 +11,13 @@ Project status:
 The I18n project is for solving the problem of I18n in application or system.
 
 It provides a simple api and model to define the I18n value.
+
+# Feature
+
+-[ ] Build an I18n from CSV file.
+-[ ] Backup I18n value.
+-[ ] An I18n message server.
+-[ ] The operator to write I18n csv file.
+
+# Usage
+TODO
