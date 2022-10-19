@@ -14,10 +14,14 @@ It provides a simple api and model to define the I18n value.
 
 # Feature
 
--[ ] Build an I18n from CSV file.
--[ ] Backup I18n value.
+-[ ] Build an I18n from or backup to file.
+    -[x] JSON File
+    -[ ] YAML file
+    -[ ] CSV file
 -[ ] An I18n message server.
+    -[ ] A simple message server.
 -[ ] The operator to write I18n csv file.
 
 # Usage
+
 TODO
