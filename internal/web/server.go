@@ -16,7 +16,7 @@ func RegisterHandler(engine *gin.Engine, config config.I18nConfig, i18nInstance 
 		{
 			message.GET("ln/:ln/*scopes", handler.MessageGet(config, i18nInstance))
 			if !config.ApplicationConfig.Readonly {
-				message.DELETE("/ln/:ln/*scopes")
+				message.DELETE("/ln/:ln/*scopes", handler.MessageDelete(config, i18nInstance))
 				message.POST("/ln/:ln/msg/:msg/*scopes", handler.MessageCreate(config, i18nInstance))
 			}
 		}
@@ -30,7 +30,6 @@ func RegisterHandler(engine *gin.Engine, config config.I18nConfig, i18nInstance 
 		ins := v1.Group("instance")
 		ins.GET("/", handler.InstanceGet(config, i18nInstance))
 		{
-
 		}
 	}
 }

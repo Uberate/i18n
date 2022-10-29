@@ -1,8 +1,6 @@
 package provider
 
 import (
-	"fmt"
-	"github.com/uberate/i18n/pkg/files"
 	"testing"
 )
 
@@ -18,28 +16,6 @@ func Init() {
 	p(ChineseLn, "未知错误")
 	ip := BaseI18nValue.IPusher("user", "text", "test")
 	ip(EnglishLn, "test")(ChineseLn, "测试")
-}
-
-func TestToJson(t *testing.T) {
-	Init()
-	value, err := files.ToJSON(BaseI18nValue)
-	if err != nil {
-		t.Error(err)
-	}
-	res, err := files.FromJson(value)
-	if err != nil {
-		t.Error(err)
-	}
-	if !res.IsMessageEquals(BaseI18nValue) {
-		t.Error("Res should equals BaseI18nValue. But not.")
-		return
-	}
-	res.PushMessage(EnglishLn, "test", "test")
-	if res.IsMessageEquals(BaseI18nValue) {
-		t.Error("Res should different from BaseI18nValue. But not.")
-		fmt.Println(files.ToJSON(res))
-		fmt.Println(files.ToJSON(BaseI18nValue))
-	}
 }
 
 func TestToStrings(t *testing.T) {

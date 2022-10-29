@@ -50,3 +50,21 @@ func MessageCreate(config config.I18nConfig, i18n *provider.I18n) gin.HandlerFun
 		i18n.PushMessage(*lk, message, strings.Split(scopes, "/")...)
 	}
 }
+
+func MessageDelete(config config.I18nConfig, i18n *provider.I18n) gin.HandlerFunc {
+	return func(context *gin.Context) {
+		language := context.Param("ln")
+		lk := provider.GetLanguageKey(language)
+		scopes := context.Param("scopes")
+
+		if len(scopes) > 0 && strings.HasSuffix(scopes, "/") {
+			scopes = scopes[:len(scopes)-1]
+		}
+		if len(scopes) > 0 && strings.HasPrefix(scopes, "/") {
+			scopes = scopes[1:]
+		}
+
+		i18n.PushMessage(*lk, "", strings.Split(scopes, "/")...)
+
+	}
+}
