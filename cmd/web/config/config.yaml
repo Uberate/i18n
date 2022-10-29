@@ -1,0 +1,4 @@
+application_config:
+  readonly: false
+  files:
+    - ./cmd/web/resources/i18n.json

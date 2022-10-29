@@ -15,6 +15,10 @@ func RegisterHandler(engine *gin.Engine, config config.I18nConfig, i18nInstance 
 		message := v1.Group("message")
 		{
 			message.GET("ln/:ln/*scopes", handler.MessageGet(config, i18nInstance))
+			if !config.ApplicationConfig.Readonly {
+				message.DELETE("/ln/:ln/*scopes")
+				message.POST("/ln/:ln/msg/:msg/*scopes", handler.MessageCreate(config, i18nInstance))
+			}
 		}
 
 		languages := v1.Group("language")
@@ -22,6 +26,11 @@ func RegisterHandler(engine *gin.Engine, config config.I18nConfig, i18nInstance 
 		{
 			languages.GET("/standards", handler.StandardList(config, i18nInstance))
 			languages.GET("/:language", handler.LanguageGet(config, i18nInstance))
+		}
+		ins := v1.Group("instance")
+		ins.GET("/", handler.InstanceGet(config, i18nInstance))
+		{
+
 		}
 	}
 }

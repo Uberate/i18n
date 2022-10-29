@@ -12,5 +12,5 @@ type I18nConfig struct {
 type ApplicationConfig struct {
 	Files           []string `json:"files" yaml:"files" mapstructure:"files"`
 	Readonly        bool     `json:"readonly" yaml:"readonly" mapstructure:"readonly"`
-	NotFoundWith404 bool
+	NotFoundWith404 bool     `json:"not_found_with_404" yaml:"not_found_with_404" mapstructure:"not_found_with_404"`
 }

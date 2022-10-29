@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/uberate/i18n/cmd/web/config"
 	"github.com/uberate/i18n/internal/web"
+	files2 "github.com/uberate/i18n/pkg/files"
 	"github.com/uberate/i18n/pkg/provider"
 	"github.com/uberate/mocker-utils/files"
 	"github.com/uberate/mocker-utils/gins"
@@ -20,7 +21,10 @@ var configInstance = &config.I18nConfig{
 func main() {
 	engine := gin.Default()
 
-	i := provider.NewI18n(provider.Custom)
+	i, err := files2.FromFiles(provider.ISO6391, configInstance.ApplicationConfig.Files...)
+	if err != nil {
+		panic(err)
+	}
 
 	web.RegisterHandler(engine, *configInstance, i)
 

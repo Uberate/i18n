@@ -19,9 +19,8 @@ func NewI18n(standard string) *I18n {
 // I18n is not thread-safe, the I18n MessageValue should build at application bootstrap age. After bootstrap, the I18n
 // info should not change(the tools of I18n except).
 type I18n struct {
-	Values          *Namespace  `yaml:"values" json:"values"`
-	DefaultLanguage LanguageKey `yaml:"default_language" json:"default_language"`
-	Standard        string      `yaml:"standard" json:"standard"`
+	Values   *Namespace `yaml:"values" json:"values"`
+	Standard string     `yaml:"standard" json:"standard"`
 }
 
 //--------------------------------------------------

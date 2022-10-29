@@ -1,0 +1,32 @@
+{
+  "values": {
+    "children": {
+      "user": {
+        "children": {
+          "text": {
+            "children": {
+              "login": {
+                "children": {},
+                "messages": {
+                  "message_value": {
+                    "zh": "用户操作 登录"
+                  }
+                }
+              }
+            },
+            "messages": {
+              "message_value": {}
+            }
+          }
+        },
+        "messages": {
+          "message_value": {}
+        }
+      }
+    },
+    "messages": {
+      "message_value": {}
+    }
+  },
+  "standard": "ISO 639-1"
+}
